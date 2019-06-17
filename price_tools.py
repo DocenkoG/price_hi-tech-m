@@ -122,13 +122,13 @@ def subInParentheses( sourceString):
 
 
 
-def currencyTypeX(rowx, colx, sheet):
+def currencyTypeX(row, col, sheet):
     '''
     Функция анализирует "формат ячейки" таблицы excel, является ли он "денежным"
     и какая валюта указана в этом формате.
     Распознаются не все валюты и способы их описания.
     '''
-    fmt_str = sheet.cell(rowx, colx).number_format
+    fmt_str = sheet.cell(row=row, column=col).number_format
     if ('\u20bd' in fmt_str or
         'р' in fmt_str):
         val = 'RUR'

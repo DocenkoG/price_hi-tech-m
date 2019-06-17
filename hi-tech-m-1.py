@@ -45,7 +45,7 @@ def getXlsxString(sh, i, in_columns_j):
             #print(sh, i, sh.cell( row=i, column=j).value, sh.cell(row=i, column=j).number_format, currencyType(sh, i, j))
         elif item == 'валюта_по_формату':
             #impValues[item] = 'RUR'
-            impValues[item] = currencyTypeX(i, j, sh)
+            impValues[item] = currencyTypeX(row=i, col=j, sheet=sh)
         else:
             impValues[item] = getCellXlsx(row=i, col=j, isDigit='N', sheet=sh)
     return impValues
@@ -409,7 +409,7 @@ def main(dealerName):
     log.info('          ' + dealerName)
 
     rc_download = False
-
+    '''
     if os.path.exists('getting.cfg'):
         cfg = config_read('getting.cfg')
         filename_new_1 = cfg.get('basic','filename_new_1')
@@ -418,7 +418,7 @@ def main(dealerName):
             rc_download = download(cfg)
         if not(rc_download==True or is_file_fresh( filename_new_1, int(cfg.get('basic','срок годности')))):
             return False
-
+    '''
     for cfgFName in os.listdir("."):
         if cfgFName.startswith("cfg") and cfgFName.endswith(".cfg"):
             log.info('----------------------- Processing '+cfgFName )
