@@ -20,7 +20,7 @@ def getXlsString(sh, i, in_columns_j):
     for item in in_columns_j.keys() :
         j = in_columns_j[item]-1
         if item in ('закупка','продажа','цена1') :
-            if getCell(row=i, col=j, isDigit='N', sheet=sh).find('Уточняйте') >=0 :
+            if getCell(row=i, col=j, isDigit='N', sheet=sh).find('По запросу') >=0 :
                 impValues[item] = '0.1'
             else :
                 impValues[item] = getCell(row=i, col=j, isDigit='Y', sheet=sh)
@@ -38,7 +38,7 @@ def getXlsxString(sh, i, in_columns_j):
     for item in in_columns_j.keys() :
         j = in_columns_j[item]
         if item in ('закупка','продажа','цена2','цена1') :
-            if getCellXlsx(row=i, col=j, isDigit='N', sheet=sh).find('по запросу') >=0:
+            if getCellXlsx(row=i, col=j, isDigit='N', sheet=sh).find('По запросу') >=0:
                 impValues[item] = '0.1'
             else :
                 impValues[item] = getCellXlsx(row=i, col=j, isDigit='Y', sheet=sh)
@@ -131,36 +131,57 @@ def convert_excel2csv(cfg):
             #impValues = getXlsString(sheet, i, in_cols_j)                # xls
             #print( impValues )
             ccc1 = sheet.cell(row=i, column=in_cols_j['цена1']).value
-            #ccc2 = sheet.cell(row=i, column=in_cols_j['цена2']).value
 
-            if (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b == True and
-                sheet.cell(row=i, column=in_cols_j['цена1']).value == None):            # подгруппа
-                subgrp = impValues['подгруппа']
-                continue
-            elif (impValues['код_'] == '' or
-                impValues['код_'] == 'Модель' or
-                impValues['цена1'] == '0'):                                             # лишняя строка
-                continue
-            else:                                                                       # Обычная строка
+            if sheetName == 'Antall':
+                if (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b == True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value == None):            # подгруппа
+                    subgrp = impValues['подгруппа']
+                    continue
+                elif (impValues['код_'] == '' or
+                    impValues['код_'] == 'Модель' or
+                    impValues['цена1'] == '0'):                                             # лишняя строка
+                    continue
                 impValues['подгруппа'] = subgrp
-                for outColName in out_template.keys() :
-                    shablon = out_template[outColName]
-                    for key in impValues.keys():
-                        if shablon.find(key) >= 0:
-                            shablon = shablon.replace(key, impValues[key])
-                    if (outColName == 'закупка') and ('*' in shablon) :
-                        p = shablon.find("*")
-                        vvv1 = float(shablon[:p])
-                        vvv2 = float(shablon[p+1:])
-                        shablon = str(round(vvv1 * vvv2, 2))
-                    recOut[outColName] = shablon.strip()
+            elif sheetName == 'LG':
+                if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b == True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value == None):            # группа
+                    grp = impValues['группа_']
+                    subgrp = ''
+                    continue
+                elif (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b == True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value != None):            # подгруппа
+                    subgrp = impValues['подгруппа']
+                elif (impValues['код_'] == '' or
+                    impValues['код_'] == 'Модель' or
+                    impValues['цена1'] == '0'):                                             # лишняя строка
+                    continue
+                impValues['группа_'] = grp
+                impValues['подгруппа'] = subgrp
 
-                if recOut['валюта'] == 'RUR':
-                    csvWriterRUR.writerow(recOut)
-                elif recOut['валюта'] == 'USD':
-                    csvWriterUSD.writerow(recOut)
-                else:
-                    log.error('нераспознана валюта "%s" для товара "%s"', recOut['валюта'], recOut['код производителя'])
+            #else:                                                                       # Обычная строка
+
+
+            #print(i_last, impValues['код_'])
+            for outColName in out_template.keys() :
+                shablon = out_template[outColName]
+                for key in impValues.keys():
+                    if shablon.find(key) >= 0:
+                        shablon = shablon.replace(key, impValues[key])
+                if (outColName == 'закупка') and ('*' in shablon) :
+                    p = shablon.find("*")
+                    vvv1 = float(shablon[:p])
+                    vvv2 = float(shablon[p+1:])
+                    shablon = str(round(vvv1 * vvv2, 2))
+                recOut[outColName] = shablon.strip()
+
+            if recOut['валюта'] == 'RUR' and recOut['продажа'] == '0.1':
+                recOut['валюта'] == 'USD'
+            if recOut['валюта'] == 'RUR':
+                csvWriterRUR.writerow(recOut)
+            elif recOut['валюта'] == 'USD':
+                csvWriterUSD.writerow(recOut)
+            else:
+                log.error('нераспознана валюта "%s" для товара "%s"', recOut['валюта'], recOut['код производителя'])
 
         except Exception as e:
             print(e)
@@ -409,7 +430,7 @@ def main(dealerName):
     log.info('          ' + dealerName)
 
     rc_download = False
-
+    '''
     if os.path.exists('getting.cfg'):
         cfg = config_read('getting.cfg')
         filename_new_1 = cfg.get('basic','filename_new_1')
@@ -418,7 +439,7 @@ def main(dealerName):
             rc_download = download(cfg)
         if not(rc_download==True or is_file_fresh( filename_new_1, int(cfg.get('basic','срок годности')))):
             return False
-
+    '''
     for cfgFName in os.listdir("."):
         if cfgFName.startswith("cfg") and cfgFName.endswith(".cfg"):
             log.info('----------------------- Processing '+cfgFName )
