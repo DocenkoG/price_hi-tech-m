@@ -175,7 +175,8 @@ def convert_excel2csv(cfg):
                 recOut[outColName] = shablon.strip()
 
             if recOut['валюта'] == 'RUR' and recOut['продажа'] == '0.1':
-                recOut['валюта'] == 'USD'
+                recOut['валюта'] = 'USD'
+                recOut['закупка'] = '0.1'
             if recOut['валюта'] == 'RUR':
                 csvWriterRUR.writerow(recOut)
             elif recOut['валюта'] == 'USD':
