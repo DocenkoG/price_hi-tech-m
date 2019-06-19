@@ -38,7 +38,8 @@ def getXlsxString(sh, i, in_columns_j):
     for item in in_columns_j.keys() :
         j = in_columns_j[item]
         if item in ('закупка','продажа','цена2','цена1') :
-            if getCellXlsx(row=i, col=j, isDigit='N', sheet=sh).find('По запросу') >=0:
+            sss = getCellXlsx(row=i, col=j, isDigit='N', sheet=sh)
+            if (sss.find('запросу') >=0 or sss.find('Звоните') >= 0):
                 impValues[item] = '0.1'
             else :
                 impValues[item] = getCellXlsx(row=i, col=j, isDigit='Y', sheet=sh)
@@ -53,14 +54,10 @@ def getXlsxString(sh, i, in_columns_j):
 
 
 def convert_excel2csv(cfg):
-    csvFfileNameRUR = cfg.get('basic', 'filename_out_RUR')
-    csvFfileNameUSD = cfg.get('basic', 'filename_out_USD')
     priceFName= cfg.get('basic','filename_in')
     sheetName = cfg.get('basic','sheetname')
 
-    outFileRUR = open(csvFfileNameRUR, 'w', newline='')
-    outFileUSD = open(csvFfileNameUSD, 'w', newline='')
-    
+
     log.debug('Reading file ' + priceFName )
     book, sheet = sheetByName(fileName = priceFName, sheetName = sheetName)
     if not sheet:
@@ -80,10 +77,25 @@ def convert_excel2csv(cfg):
     #    discount[k] = (100 - int(discount[k]))/100
     #print(discount)
 
-    csvWriterRUR = csv.DictWriter(outFileRUR, fieldnames=cfg.options('cols_out'))
-    csvWriterUSD = csv.DictWriter(outFileUSD, fieldnames=cfg.options('cols_out'))
-    csvWriterRUR.writeheader()
-    csvWriterUSD.writeheader()
+    outFileUSD = False
+    outFileEUR = False
+    outFileRUR = False
+    if cfg.has_option('basic','filename_out_RUR'):
+        csvFfileNameRUR = cfg.get('basic', 'filename_out_RUR')
+        outFileRUR = open(csvFfileNameRUR, 'w', newline='')
+        csvWriterRUR = csv.DictWriter(outFileRUR, fieldnames=cfg.options('cols_out'))
+        csvWriterRUR.writeheader()
+    if cfg.has_option('basic', 'filename_out_USD'):
+        csvFfileNameUSD = cfg.get('basic', 'filename_out_USD')
+        outFileUSD = open(csvFfileNameUSD, 'w', newline='')
+        csvWriterUSD = csv.DictWriter(outFileUSD, fieldnames=cfg.options('cols_out'))
+        csvWriterUSD.writeheader()
+    if cfg.has_option('basic', 'filename_out_EUR'):
+        csvFfileNameEUR = cfg.get('basic', 'filename_out_EUR')
+        outFileEUR = open(csvFfileNameEUR, 'w', newline='')
+        csvWriterEUR = csv.DictWriter(outFileEUR, fieldnames=cfg.options('cols_out'))
+        csvWriterEUR.writeheader()
+
 
     '''                                     # Блок проверки свойств для распознавания групп      XLSX
     for i in range(2, 15):
@@ -133,35 +145,48 @@ def convert_excel2csv(cfg):
             ccc1 = sheet.cell(row=i, column=in_cols_j['цена1']).value
 
             if sheetName == 'Antall':
-                if (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b == True and
-                    sheet.cell(row=i, column=in_cols_j['цена1']).value == None):            # подгруппа
+                if (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None):          # подгруппа
                     subgrp = impValues['подгруппа']
                     continue
                 elif (impValues['код_'] == '' or
                     impValues['код_'] == 'Модель' or
-                    impValues['цена1'] == '0'):                                             # лишняя строка
+                    impValues['цена1'] == '0'):                                           # лишняя строка
                     continue
                 impValues['подгруппа'] = subgrp
+
             elif sheetName == 'LG':
-                if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b == True and
-                    sheet.cell(row=i, column=in_cols_j['цена1']).value == None):            # группа
+                if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None):          # группа
                     grp = impValues['группа_']
                     subgrp = ''
                     continue
-                elif (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b == True and
-                    sheet.cell(row=i, column=in_cols_j['цена1']).value != None):            # подгруппа
+                elif (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is not None):      # подгруппа
                     subgrp = impValues['подгруппа']
                 elif (impValues['код_'] == '' or
                     impValues['код_'] == 'Модель' or
-                    impValues['цена1'] == '0'):                                             # лишняя строка
+                    impValues['цена1'] == '0'):                                           # лишняя строка
                     continue
                 impValues['группа_'] = grp
                 impValues['подгруппа'] = subgrp
 
-            #else:                                                                       # Обычная строка
+            elif sheetName == 'ArthurHolm':
+                if (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None):          # подгруппа
+                    subgrp = impValues['подгруппа']
+                    continue
+                elif (impValues['код_'] == '' or
+                    impValues['код_'] == 'Модель' or
+                    impValues['цена1'] == '0'):                                           # лишняя строка
+                    continue
+                impValues['подгруппа'] = subgrp
+                if '\n' in impValues['код_']:
+                    p = impValues['код_'].find('\n')
+                    impValues['код_'] = impValues['код_'][:p]
+            else:
+                log.error('нераспознан sheetName "%s"', sheetName)      # далее общая для всех обработка
 
-
-            #print(i_last, impValues['код_'])
             for outColName in out_template.keys() :
                 shablon = out_template[outColName]
                 for key in impValues.keys():
@@ -174,13 +199,15 @@ def convert_excel2csv(cfg):
                     shablon = str(round(vvv1 * vvv2, 2))
                 recOut[outColName] = shablon.strip()
 
-            if recOut['валюта'] == 'RUR' and recOut['продажа'] == '0.1':
+            if recOut['валюта'] != 'USD' and recOut['продажа'] == '0.1':
                 recOut['валюта'] = 'USD'
                 recOut['закупка'] = '0.1'
             if recOut['валюта'] == 'RUR':
                 csvWriterRUR.writerow(recOut)
             elif recOut['валюта'] == 'USD':
                 csvWriterUSD.writerow(recOut)
+            elif recOut['валюта'] == 'EUR':
+                csvWriterEUR.writerow(recOut)
             else:
                 log.error('нераспознана валюта "%s" для товара "%s"', recOut['валюта'], recOut['код производителя'])
 
@@ -192,8 +219,12 @@ def convert_excel2csv(cfg):
                 log.debug('Exception: <' + str(e) + '> при обработке строки ' + str(i) +'.' )
 
     log.info('Обработано ' +str(i_last)+ ' строк.')
-    outFileRUR.close()
-    outFileUSD.close()
+    if outFileRUR:
+        outFileRUR.close()
+    if outFileUSD:
+        outFileUSD.close()
+    if outFileEUR:
+        outFileEUR.close()
 
 
 
@@ -291,8 +322,6 @@ def download( cfg ):
         driver.implicitly_wait(10)
         driver.set_page_load_timeout(10)
 
-        #driver.get(url_lk)
-        #time.sleep(2)
         try:
             driver.get(url_file_1)
         except Exception as e:
@@ -313,17 +342,17 @@ def download( cfg ):
             new_file_date = os.path.getmtime(DnewFile1)
             log.info('Скачанный файл ' + new_file_1 + ' имеет дату ' + time.strftime("%Y-%m-%d %H:%M:%S",
                                                                                    time.localtime(new_file_date)))
-
+        '''
         dir_befo_download = set(os.listdir(download_path))
         try:
             driver.get(url_file_2)
         except Exception as e:
             log.debug('Exception: <' + str(e) + '>')
-
+        '''
     except Exception as e:
         log.debug('Exception: <' + str(e) + '>')
     driver.quit()
-
+    '''
     dir_afte_download = set(os.listdir(download_path))
     new_files = list(dir_afte_download.difference(dir_befo_download))
     if len(new_files) < 1:
@@ -346,7 +375,7 @@ def download( cfg ):
         os.rename(filename_new_2, filename_old_2)
     shutil.copy2(DnewFile2, filename_new_2)
     retCode = True
-
+    '''
     if new_ext_1 == '.zip':
         log.debug('Zip-архив. Разархивируем.')
         work_dir = os.getcwd()
