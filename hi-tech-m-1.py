@@ -9,9 +9,8 @@ import time
 import shutil
 import openpyxl                       # Для .xlsx
 #import xlrd                          # для .xls
-from   price_tools import getCellXlsx, getCell, quoted, dump_cell, currencyTypeX, openX, sheetByName
+from   price_tools import getCellXlsx, getCell, nameToId, currencyTypeX, sheetByName
 import csv
-import requests, lxml.html
 
 
 
@@ -199,6 +198,7 @@ def convert_excel2csv(cfg):
                     shablon = str(round(vvv1 * vvv2, 2))
                 recOut[outColName] = shablon.strip()
 
+            recOut['код'] = nameToId(recOut['код'])
             if recOut['валюта'] != 'USD' and recOut['продажа'] == '0.1':
                 recOut['валюта'] = 'USD'
                 recOut['закупка'] = '0.1'
