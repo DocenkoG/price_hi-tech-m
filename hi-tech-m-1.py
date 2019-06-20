@@ -154,6 +154,33 @@ def convert_excel2csv(cfg):
                     continue
                 impValues['подгруппа'] = subgrp
 
+            elif sheetName == 'ArthurHolm':
+                if (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None):          # подгруппа
+                    subgrp = impValues['подгруппа']
+                    continue
+                elif (impValues['код_'] == '' or
+                    impValues['код_'] == 'Модель' or
+                    impValues['цена1'] == '0'):                                           # лишняя строка
+                    continue
+                impValues['подгруппа'] = subgrp
+                if '\n' in impValues['код_']:
+                    p = impValues['код_'].find('\n')
+                    impValues['код_'] = impValues['код_'][:p]
+
+            elif sheetName == 'Aten':
+                if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None):          # группа
+                    grp = impValues['группа_']
+                    continue
+                elif (impValues['код_'] == '' or
+                    impValues['код_'] == 'Артикул' or
+                    impValues['цена1'] == '0'):                                           # лишняя строка
+                    continue
+                impValues['группа_'] = grp
+                if impValues['примечание'] != '':
+                    impValues['примечание'] = ' (' + impValues['примечание'] + ')'
+
             elif sheetName == 'LG':
                 if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
                     sheet.cell(row=i, column=in_cols_j['цена1']).value is None):          # группа
@@ -170,19 +197,6 @@ def convert_excel2csv(cfg):
                 impValues['группа_'] = grp
                 impValues['подгруппа'] = subgrp
 
-            elif sheetName == 'ArthurHolm':
-                if (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b is True and
-                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None):          # подгруппа
-                    subgrp = impValues['подгруппа']
-                    continue
-                elif (impValues['код_'] == '' or
-                    impValues['код_'] == 'Модель' or
-                    impValues['цена1'] == '0'):                                           # лишняя строка
-                    continue
-                impValues['подгруппа'] = subgrp
-                if '\n' in impValues['код_']:
-                    p = impValues['код_'].find('\n')
-                    impValues['код_'] = impValues['код_'][:p]
             else:
                 log.error('нераспознан sheetName "%s"', sheetName)      # далее общая для всех обработка
 
