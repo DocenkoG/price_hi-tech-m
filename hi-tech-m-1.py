@@ -131,6 +131,7 @@ def convert_excel2csv(cfg):
 
     recOut  ={}
     subgrp = ''
+    grp = ''
     for i in range(1, sheet.max_row +1) :                               # xlsx
 #   for i in range(1, sheet.nrows) :                                     # xls
         i_last = i
@@ -180,6 +181,25 @@ def convert_excel2csv(cfg):
                 impValues['группа_'] = grp
                 if impValues['примечание'] != '':
                     impValues['примечание'] = ' (' + impValues['примечание'] + ')'
+
+            elif sheetName == 'Biamp':
+                if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None and
+                    sheet.cell(row=i, column=in_cols_j['группа_']).font.sz == 11.0):        # группа
+                    grp = impValues['группа_']
+                    subgrp = ''
+                    continue
+                elif (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None and
+                    sheet.cell(row=i, column=in_cols_j['подгруппа']).font.sz == 10.0):      # подгруппа
+                    subgrp = impValues['подгруппа']
+                    continue
+                elif (impValues['код_'] == '' or
+                    impValues['код_'] == 'Модель' or
+                    impValues['цена1'] == '0'):                                             # лишняя строка
+                    continue
+                impValues['группа_'] = grp
+                impValues['подгруппа'] = subgrp
 
             elif sheetName == 'LG':
                 if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
