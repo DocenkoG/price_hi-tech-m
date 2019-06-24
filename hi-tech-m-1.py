@@ -186,7 +186,7 @@ def convert_excel2csv(cfg):
                 if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
                     sheet.cell(row=i, column=in_cols_j['цена1']).value is None and
                     sheet.cell(row=i, column=in_cols_j['группа_']).font.sz == 11.0):        # группа
-                    grp = impValues['группа_']
+                    grp = impValues['группа_'].encode('cp1251', errors='replace').decode('cp1251')
                     subgrp = ''
                     continue
                 elif (sheet.cell(row=i, column=in_cols_j['подгруппа']).font.b is True and
@@ -200,6 +200,8 @@ def convert_excel2csv(cfg):
                     continue
                 impValues['группа_'] = grp
                 impValues['подгруппа'] = subgrp
+                impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
+                impValues['код_'] = impValues['код_'].encode('cp1251', errors='replace').decode('cp1251')
 
             elif sheetName == 'LG':
                 if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
@@ -495,6 +497,7 @@ def main(dealerName):
 
     rc_download = False
     '''
+    '''
     if os.path.exists('getting.cfg'):
         cfg = config_read('getting.cfg')
         filename_new_1 = cfg.get('basic','filename_new_1')
@@ -503,7 +506,6 @@ def main(dealerName):
             rc_download = download(cfg)
         if not(rc_download==True or is_file_fresh( filename_new_1, int(cfg.get('basic','срок годности')))):
             return False
-    '''
     for cfgFName in os.listdir("."):
         if cfgFName.startswith("cfg") and cfgFName.endswith(".cfg"):
             log.info('----------------------- Processing '+cfgFName )
