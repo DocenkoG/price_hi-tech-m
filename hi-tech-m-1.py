@@ -226,6 +226,20 @@ def convert_excel2csv(cfg):
                     p = impValues['код_'].find('\n')
                     impValues['код_'] = impValues['код_'][:p]
 
+            elif sheetName == 'DigitalProjection':
+                if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['код_']).value is None):            # группа
+                    grp = impValues['группа_']
+                    subgrp = ''
+                    continue
+                elif (impValues['код_'] == '' or
+                    impValues['код_'] == 'Part #' or
+                    impValues['цена1'] == '0'):                                             # лишняя строка
+                    continue
+                impValues['группа_'] = grp
+                if impValues['3d'] != '':
+                    impValues['3d'] = '3D'
+
             elif sheetName == 'LG':
                 if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
                     sheet.cell(row=i, column=in_cols_j['цена1']).value is None):            # группа
@@ -258,7 +272,7 @@ def convert_excel2csv(cfg):
                 recOut[outColName] = shablon.strip()
 
             recOut['код'] = nameToId(recOut['код'])
-            if recOut['валюта'] != 'USD' and recOut['продажа'] == '0.1':
+            if  recOut['продажа'] == '0.1':
                 recOut['валюта'] = 'USD'
                 recOut['закупка'] = '0.1'
             if recOut['валюта'] == 'RUR':
