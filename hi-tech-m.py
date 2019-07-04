@@ -275,6 +275,7 @@ def convert_excel2csv(cfg):
                     continue
                 if impValues['страна_'] == '':
                     impValues['страна_'] = 'Страна происхождения: ' + impValues['страна_']
+                impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
 
             elif sheetName == 'Sharp':
                 if impValues['группа_'] != '':                                              # группа
