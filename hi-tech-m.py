@@ -244,7 +244,7 @@ def convert_excel2csv(cfg):
             elif sheetName == 'Lumens':
                 if (sheet.cell(row=i, column=in_cols_j['подгруппа']).value is not None and
                     sheet.cell(row=i, column=in_cols_j['цена1']).value is None and
-                    sheet.cell(row=i, column=in_cols_j['код_']).value is None):            # подгруппа
+                    sheet.cell(row=i, column=in_cols_j['код_']).value is None):             # подгруппа
                     subgrp = impValues['подгруппа']
                     continue
                 elif (impValues['код_'] == '' or
@@ -265,7 +265,27 @@ def convert_excel2csv(cfg):
                     grp.find('дисплеи') < 0):                                               # лишняя строка
                     continue
                 impValues['группа_'] = grp
+                impValues['описание'] = impValues['описание'].replace('×','x')
                 impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
+
+            elif sheetName == 'Shure':
+                if (impValues['код_'] == '' or
+                    impValues['код_'] == 'Артикул' or
+                    impValues['цена1'] == '0'):                                             # лишняя строка
+                    continue
+                if impValues['страна_'] == '':
+                    impValues['страна_'] = 'Страна происхождения: ' + impValues['страна_']
+
+            elif sheetName == 'Sharp':
+                if impValues['группа_'] != '':                                              # группа
+                    grp = impValues['группа_']
+                    continue
+                elif (impValues['код_'] == '' or
+                    impValues['код_'] == 'Модель' or
+                    impValues['цена1'] == '0'):                                             # лишняя строка
+                    continue
+                if impValues['группа_'] == '':
+                    impValues['группа_'] = grp
 
             elif sheetName == 'LG':
                 if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
@@ -277,7 +297,7 @@ def convert_excel2csv(cfg):
                     sheet.cell(row=i, column=in_cols_j['цена1']).value is not None):        # подгруппа
                     subgrp = impValues['подгруппа']
                 elif (impValues['код_'] == '' or
-                    impValues['код_'] == 'Модель' or
+                    impValues['код_'] == 'Артикул' or
                     impValues['цена1'] == '0'):                                             # лишняя строка
                     continue
                 impValues['группа_'] = grp
