@@ -240,6 +240,30 @@ def convert_excel2csv(cfg):
                 if impValues['3d'] != '':
                     impValues['3d'] = '3D'
 
+            elif sheetName == 'Lumens':
+                if (sheet.cell(row=i, column=in_cols_j['подгруппа']).value is not None and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None and
+                    sheet.cell(row=i, column=in_cols_j['код_']).value is None):            # подгруппа
+                    subgrp = impValues['подгруппа']
+                    continue
+                elif (impValues['код_'] == '' or
+                    impValues['код_'] == 'Модель' or
+                    impValues['цена1'] == '0'):                                             # лишняя строка
+                    continue
+                impValues['подгруппа'] = subgrp
+
+            elif sheetName == 'Triolion':
+                if (sheet.cell(row=i, column=in_cols_j['группа_']).value is not None and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None):            # группа
+                    grp = impValues['группа_']
+                    continue
+                elif (impValues['код_'] == '' or
+                    impValues['код_'] == 'Модель' or
+                    impValues['цена1'] == '0' or
+                    grp.find('дисплеи') < 0):                                               # лишняя строка
+                    continue
+                impValues['группа_'] = grp
+
             elif sheetName == 'LG':
                 if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
                     sheet.cell(row=i, column=in_cols_j['цена1']).value is None):            # группа
