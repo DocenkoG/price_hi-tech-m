@@ -203,7 +203,7 @@ def nameToId(value):
     result = ''
     for ch in value:
         if (ch != " " and ch != "/" and ch != "\\" and ch != '_' and ch != "," and
-                ch != "'" and ch != "." and ch != "-" and ch != "!" and ch != "@" and
+                ch != "'" and ch != "!" and ch != "@" and                         # ch != "." and ch != "-" and
                 ch != "#" and ch != "$" and ch != "%" and ch != "^" and ch != "&" and
                 ch != "*" and ch != "(" and ch != ")" and ch != "[" and ch != "]" and
                 ch != "{" and ch != ":" and ch != '"' and ch != ";"):

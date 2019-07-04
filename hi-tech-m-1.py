@@ -165,6 +165,7 @@ def convert_excel2csv(cfg):
                     impValues['цена1'] == '0'):                                           # лишняя строка
                     continue
                 impValues['подгруппа'] = subgrp
+                impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
                 if '\n' in impValues['код_']:
                     p = impValues['код_'].find('\n')
                     impValues['код_'] = impValues['код_'][:p]
@@ -251,6 +252,7 @@ def convert_excel2csv(cfg):
                     impValues['цена1'] == '0'):                                             # лишняя строка
                     continue
                 impValues['подгруппа'] = subgrp
+                impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
 
             elif sheetName == 'Triolion':
                 if (sheet.cell(row=i, column=in_cols_j['группа_']).value is not None and
@@ -263,6 +265,7 @@ def convert_excel2csv(cfg):
                     grp.find('дисплеи') < 0):                                               # лишняя строка
                     continue
                 impValues['группа_'] = grp
+                impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
 
             elif sheetName == 'LG':
                 if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
@@ -283,7 +286,7 @@ def convert_excel2csv(cfg):
             else:
                 log.error('нераспознан sheetName "%s"', sheetName)      # далее общая для всех обработка
 
-            for outColName in out_template.keys() :
+            for outColName in out_template.keys():
                 shablon = out_template[outColName]
                 for key in impValues.keys():
                     if shablon.find(key) >= 0:
