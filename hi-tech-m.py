@@ -315,6 +315,21 @@ def convert_excel2csv(cfg):
                     impValues['статус'] = '(' + impValues['статус'] + ')'
                 impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
 
+            elif sheetName == 'WyreStorm':
+                if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['код_']).value is None):            # группа
+                    grp = impValues['группа_']
+                    subgrp = ''
+                    continue
+                impValues['группа_'] = grp
+                if (impValues['код_'] == '' or
+                    impValues['группа_'] == 'АНОНС ПРОДУКТОВ' or
+                    impValues['код_'] == 'Модель' or
+                    impValues['описание'] == '-' or
+                    impValues['цена1'] == '0'):                                         # лишняя строка
+                    continue
+                impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
+
             else:
                 log.error('нераспознан sheetName "%s"', sheetName)      # далее общая для всех обработка
 
@@ -331,6 +346,8 @@ def convert_excel2csv(cfg):
                 recOut[outColName] = shablon.strip()
 
             recOut['код'] = nameToId(recOut['код'])
+            if recOut['валюта'] == '':
+                 recOut['валюта'] = 'RUR'
             if  recOut['продажа'] == '0.1':
                 recOut['валюта'] = 'USD'
                 recOut['закупка'] = '0.1'

@@ -129,15 +129,16 @@ def currencyTypeX(row, col, sheet):
     Распознаются не все валюты и способы их описания.
     '''
     fmt_str = sheet.cell(row=row, column=col).number_format
-    if ('\u20bd' in fmt_str or
-        'р' in fmt_str):
-        val = 'RUR'
+    #print(fmt_str)
+    if (fmt_str.find('USD')>=0) or (fmt_str.find('[$$')>=0) or (fmt_str.find('"$"')>=0) :
+        val = 'USD'
     elif '\xa3' in fmt_str:
         val = 'GBP'
     elif chr(8364) in fmt_str:
         val = 'EUR'
-    elif (fmt_str.find('USD')>=0) or (fmt_str.find('[$$')>=0) :
-        val = 'USD'
+    elif ('\u20bd' in fmt_str or
+        'р' in fmt_str):
+        val = 'RUR'
     else:
         val = ''
     return val

@@ -1,5 +1,3 @@
-chcp 1251
+python.exe hi-tech-m.py
 
-"c:\Program Files\Python35\python.exe" hi-tech-m.py
-
-rem pause
+rem  pause
