@@ -330,6 +330,21 @@ def convert_excel2csv(cfg):
                     continue
                 impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
 
+            elif sheetName == 'Mipro':
+                if (sheet.cell(row=i, column=in_cols_j['группа_']).font.b is True and
+                    sheet.cell(row=i, column=in_cols_j['цена1']).value is None):            # группа
+                    grp = impValues['группа_']
+                    subgrp = ''
+                    continue
+                impValues['группа_'] = grp
+                if (impValues['код_'] == '' or
+                    impValues['группа_'] == 'Код производителя' or
+                    impValues['код_'] == 'Код производителя' or
+                    impValues['описание'] == '-' or
+                    impValues['цена1'] == '0'):                                         # лишняя строка
+                    continue
+                impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
+
             else:
                 log.error('нераспознан sheetName "%s"', sheetName)      # далее общая для всех обработка
 

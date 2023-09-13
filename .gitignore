@@ -11,6 +11,7 @@
 private*
 *.sublime-workspace
 *.sublime-project
+csv-plugin.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
