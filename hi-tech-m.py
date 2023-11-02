@@ -309,8 +309,8 @@ def convert_excel2csv(cfg):
                     impValues['код_'] == 'Модель' or
                     impValues['цена1'] == '0'):                                             # лишняя строка
                     continue
-                if impValues['страна_'] != '':
-                    impValues['страна_'] = 'Страна происхождения: ' + impValues['страна_']
+#                if impValues['страна_'] != '':
+#                    impValues['страна_'] = 'Страна происхождения: ' + impValues['страна_']
                 if impValues['статус'] != '':
                     impValues['статус'] = '(' + impValues['статус'] + ')'
                 impValues['описание'] = impValues['описание'].encode('cp1251', errors='replace').decode('cp1251')
